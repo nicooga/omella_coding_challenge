@@ -1,0 +1,23 @@
+default: &default
+  adapter: postgresql
+  encoding: unicode
+  pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
+
+  # In production I would use a strong password,
+  # or maybe another authentication method.
+  username: omella
+  password: omella
+
+development:
+  <<: *default
+  database: omella_development
+
+test:
+  <<: *default
+  database: omella_test
+
+production:
+  <<: *default
+  database: omella_production
+  username: omella
+  password: <%= ENV['OMELLA_DATABASE_PASSWORD'] %>

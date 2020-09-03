@@ -1,0 +1,28 @@
+{
+  "presets": [
+    "@babel/preset-env",
+    "@babel/preset-react"
+  ],
+  "plugins": [
+    "styled-components",
+    "import-graphql",
+    "@babel/plugin-proposal-export-default-from",
+    "@babel/plugin-proposal-optional-chaining",
+    ["@babel/plugin-proposal-pipeline-operator", { "proposal": "smart" }],
+    ["module-resolver", {
+      "root": ["."],
+      "alias": {
+        "$root": ".",
+        "$src": "./src",
+        "$test": "./test",
+      },
+      "transformFunctions": [
+        "require",
+        "require.resolve",
+        "System.import",
+        "readFileSync",
+        "reload",
+      ]
+    }]
+  ]
+}
