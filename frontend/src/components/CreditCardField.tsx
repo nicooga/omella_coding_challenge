@@ -1,13 +1,14 @@
 import React, { useEffect } from 'react';
 import styled from 'styled-components';
 
-import useEventValueCollector from '../hooks/useEventValueCollector';
-
 import Input from './Input';
 import NumericInput from './NumericInput';
 import FormField from './FormField';
 
-type Props = { onChange: (cc: CreditCard) => void };
+type Props = {
+  onChange: (cc: CreditCard) => void,
+  value: CreditCard
+};
 
 const Root = styled.div`
   display: flex;
@@ -17,63 +18,54 @@ const Root = styled.div`
   }
 `
 
-const CreditCardField = ({ onChange }: Props) => {
-  const [number, onNumberChange] = useEventValueCollector();
-  const [expMonth, onExpMonthChange] = useEventValueCollector();
-  const [expYear, onExpYearChange] = useEventValueCollector();
-  const [cvc, onCvcChange] = useEventValueCollector();
+const CreditCardField = ({ value: cc, onChange }: Props) => (
+  <Root>
+    <FormField label='Card Number' htmlFor='card-number'>
+      <NumericInput
+        id='card-number'
+        value={cc.number || ''}
+        onChange={ev => onChange({ ...cc, number: ev.target.value })}
+        maxLength={20}
+      />
+    </FormField>
 
-  useEffect(() => {
-    onChange({ number, expMonth, expYear, cvc });
-  }, [number, expMonth, expYear, cvc]);
+    {/*
+      Here I could have used a select with a list of months and year.
+      For simplicity's sake I just used a numeric input.
+      In fact I remember using a lot of credit card forms that work like this,
+      and it can be arguably be considered better UX than a select
+    */}
 
-  return (
-    <Root>
-      <FormField label='Card Number' htmlFor='card-number'>
-        <NumericInput
-          id='card-number'
-          onChange={onNumberChange}
-          maxLength={20}
-        />
-      </FormField>
+    <FormField label='Expiration' htmlFor='exp-month'>
+      <Input
+        id='exp-month'
+        value={cc.expMonth || ''}
+        onChange={ev => onChange({ ...cc, expMonth: ev.target.value })}
+        maxLength={2}
+        style={{ width: '40px' }}
+        placeholder='mm'
+      />
 
-      {/*
-        Here I could have used a select with a pre-selection for month and year.
-        For simplicity's sake I just used a numeric input.
-        In fact I remember using a lot of credit card forms that work like this,
-        and it can be arguably be considered better UX than a select because of it's simplicity.
-      */}
+      <Input
+        id='exp-year'
+        value={cc.expYear || ''}
+        onChange={ev => onChange({ ...cc, expYear: ev.target.value })}
+        maxLength={2}
+        style={{ width: '40px' }}
+        placeholder='yy'
+      />
+    </FormField>
 
-      <FormField label='Exp. Month' htmlFor='exp-month'>
-        <Input
-          id='exp-month'
-          onChange={onExpMonthChange}
-          maxLength={2}
-          style={{ width: '70px' }}
-          placeholder='mm'
-        />
-      </FormField>
-
-      <FormField label='Exp. Year' htmlFor='exp-year'>
-        <Input
-          id='exp-year'
-          onChange={onExpYearChange}
-          maxLength={4}
-          style={{ width: '70px' }}
-          placeholder='yyyy'
-        />
-      </FormField>
-
-      <FormField label='CVC' htmlFor='cvc'>
-        <Input
-          id='cvc'
-          onChange={onCvcChange}
-          maxLength={3}
-          style={{ width: '70px' }}
-        />
-      </FormField>
-    </Root>
-  );
-};
+    <FormField label='CVC' htmlFor='cvc'>
+      <Input
+        id='cvc'
+        value={cc.cvc || ''}
+        onChange={ev => onChange({ ...cc, cvc: ev.target.value })}
+        maxLength={3}
+        style={{ width: '70px' }}
+      />
+    </FormField>
+  </Root>
+);
 
 export default CreditCardField;

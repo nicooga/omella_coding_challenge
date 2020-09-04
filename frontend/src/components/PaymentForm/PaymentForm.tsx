@@ -1,7 +1,6 @@
 import React, { useState, useCallback } from 'react';
 import styled from 'styled-components';
 
-import useEventValueCollector from '../../hooks/useEventValueCollector';
 import usePaymentCreation from './usePaymentCreation';
 
 import CreditCardField from '../CreditCardField';
@@ -18,9 +17,10 @@ type Props = {
 const Root = styled.form`
   display: flex;
   flex-direction: column;
-  padding: 16px;;;
+  padding: 16px;
   background-color: whitesmoke;
   border-radius: 8px;
+  align-self: center;
 
   & > :not(:last-child) {
     margin-bottom: 16px;
@@ -29,16 +29,20 @@ const Root = styled.form`
 
 const PaymentForm = ({ onSuccess }: Props) => {
   const [creditCard, setCreditCard] = useState<CreditCard>({});
-  const [amount, onAmountChange] = useEventValueCollector();
+  const [amount, setAmount] = useState<string>();
 
   // This is how I hid (I mean, encapsulated) the API consumption behavior.
   // If we continued to consume this API with the same format, we would generalize
   // this into a reusable hook for other components.
   const { perform, errors, submitting } = usePaymentCreation();
 
-  const onSubmit = useCallback(ev => {
+  const onSubmit = useCallback(async ev => {
     ev.preventDefault();
-    perform({ creditCard, amount, onSuccess });
+    const payment = await perform({ creditCard, amount });
+    onSuccess(payment);
+    setCreditCard({})
+    setAmount('');
+    alert('Thank your for donating!');
   }, [perform, creditCard, amount, onSuccess]);
 
   return (
@@ -46,13 +50,18 @@ const PaymentForm = ({ onSuccess }: Props) => {
       <ErrorMessages errors={errors} />
 
       <FormField label='Donation amount (USD)' htmlFor='amount' >
-        <Input id='amount' type='number' onChange={onAmountChange} />
+        <Input
+          id='amount'
+          type='number'
+          value={amount}
+          onChange={ev => setAmount(ev.target.value)}
+        />
       </FormField>
 
-      <CreditCardField onChange={setCreditCard} />
+      <CreditCardField value={creditCard} onChange={setCreditCard} />
 
-    <Button type='submit' disabled={submitting}>
-        Confirm
+      <Button type='submit' disabled={submitting}>
+        {submitting ? 'submitting ...' : 'Confirm'}
       </Button>
     </Root>
   );

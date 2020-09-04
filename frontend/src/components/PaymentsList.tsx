@@ -6,6 +6,9 @@ import Backend from '../Backend';
 const Root = styled.div`
   display: flex;
   flex-direction: column;
+  border-radius: 8px;
+  background-color: whitesmoke;
+  padding: 8px;
 
   & > :not(:last-child) {
     margin-bottom: 16px;

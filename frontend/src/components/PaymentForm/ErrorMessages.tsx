@@ -14,6 +14,12 @@ const Root = styled.div`
   }
 `
 
+const Label = styled.label`
+  font-weight: bold;
+`
+
+// I know I can do better job showing errors.
+// I kept it simple.
 const ErrorMessages = ({ errors }: Props) => {
   console.log({ errors })
 
@@ -24,12 +30,10 @@ const ErrorMessages = ({ errors }: Props) => {
       <h2>Errors:</h2>
 
       {Object.entries(errors).map(([attribute, messages]) => (
-        <>
-          <label>{attribute}</label>
-          <ul key={attribute}>
-            {messages.map((m, i) => (<li key={i}>{m}</li>))}
-          </ul>
-        </>
+        <div key={attribute}>
+          {attribute !== 'base' && (<Label>{attribute}</Label>)}
+          {messages.map((m, i) => (<div key={i}>{m}</div>))}
+        </div>
       ))}
     </Root>
   )

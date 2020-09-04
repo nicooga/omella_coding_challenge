@@ -19,10 +19,16 @@ const Label = styled.label`
   color: grey;
 `
 
+const InputWrapper = styled.div`
+  display: flex;
+`
+
 const FormField = ({ children, label, htmlFor }: Props) => (
   <Root>
     <Label htmlFor={htmlFor}>{label}</Label>
-    {children}
+    <InputWrapper>
+      {children}
+    </InputWrapper>
   </Root>
 );
 

@@ -8,7 +8,7 @@ class PaymentsController < ApplicationController
   #
   # None of this is needed for this simple example.
   def index
-    respond_with_data Payment.all, methods: :amount
+    respond_with_data Payment.order(created_at: :desc).all, methods: :amount
   end
 
   def create

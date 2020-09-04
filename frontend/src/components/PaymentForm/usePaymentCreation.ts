@@ -3,8 +3,7 @@ import Backend from '../../Backend';
 
 type PerformArgs = {
   creditCard: CreditCard,
-  amount?: string,
-  onSuccess: (p: Payment) => void
+  amount?: string
 };
 
 // This could be a generalizable pattern if the API response format remained consistent across different endpoints.
@@ -13,24 +12,26 @@ const usePaymentCreation = () => {
   const [submitting, setSubmitting] = useState<boolean>(false);
   const [errors, setErrors] = useState<BackendResponseErrorMessages>({});
 
-  const perform = useCallback(async ({ creditCard, amount, onSuccess }: PerformArgs) => {
+  const perform = useCallback(async ({ creditCard, amount }: PerformArgs) => {
     setErrors({});
     setSubmitting(true);
 
     try {
-      const response = await Backend.createPayment({ creditCard, amount: amount! });
+      const response = await Backend.createPayment({ creditCard, amount: amount!  });
 
       if (response.success) {
-        onSuccess(response.data);
+        return response.data;
+      } else if (typeof response.errors === 'object') {
+        throw response.errors;
+      } else if (response.error) {
+        throw { base: [response.error] };
       } else {
-        if (typeof response.errors === 'object') {
-          setErrors(response.errors);
-        } else if (response.error) {
-          setErrors({ base: [response.error] })
-        }
+        throw undefined;
       }
-    } catch {
-      setErrors({ base: ['Something went wrong ... :('] })
+    } catch(newErrors) {
+      const actualErrors = newErrors || { base: ['Something went wrong ... :('] }
+      setErrors(actualErrors)
+      throw actualErrors;
     } finally {
       setSubmitting(false);
     }

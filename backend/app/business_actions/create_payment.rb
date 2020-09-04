@@ -8,6 +8,10 @@ class CreatePayment < BusinessAction
     :card_exp_year, :card_cvc, presence: true
 
   validates :card_exp_month, format: /\A0[1-9]|1[0-2]\z/
+  validates :card_exp_year, numericality: {
+    greater_than_or_equal_to: -> _action { Time.zone.now.year.to_s.last(2).to_i },
+    allow_nil: true
+  }
 
   private
 
@@ -16,6 +20,7 @@ class CreatePayment < BusinessAction
       begin
         create_payment_method
       rescue Stripe::StripeError => error
+        Rails.logger.debug(error)
         perform_phase_errors.add(:base, 'Error while creating payment method')
         return
       end
@@ -24,6 +29,7 @@ class CreatePayment < BusinessAction
       begin
         create_payment_intent(payment_method.id)
       rescue Stripe::StripeError => error
+        Rails.logger.debug(error)
         perform_phase_errors.add(:base, 'Error while creating payment intent')
         return
       end

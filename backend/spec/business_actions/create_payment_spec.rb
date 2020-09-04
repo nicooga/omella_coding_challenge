@@ -1,29 +1,32 @@
 require 'rails_helper'
 require 'stripe'
 
-VALID_PARAMS = {
-  amount: 100,
-  card_number: '123',
-  card_exp_month: '02',
-  card_exp_year: '23',
-  card_cvc: '222'
-}
-
-INVALID_PARAMS = {}
-
 RSpec.describe CreatePayment do
   include Shoulda::Matchers::ActiveModel
+
+  CURRENT_YEAR = Time.zone.now.year.to_s.last(2).to_i
+
+  VALID_PARAMS = {
+    amount: 100,
+    card_number: '123',
+    card_exp_month: '02',
+    card_exp_year: CURRENT_YEAR,
+    card_cvc: '222'
+  }
+
+  INVALID_PARAMS = {}
 
   subject(:action) { described_class.new(params) }
 
   describe 'validations' do
-    subject { described_class.new }
+    let(:params) { VALID_PARAMS }
 
     it { is_expected.to validate_presence_of(:amount) }
     it { is_expected.to validate_presence_of(:card_number) }
     it { is_expected.to validate_presence_of(:card_exp_month) }
     it { is_expected.to validate_presence_of(:card_exp_year) }
     it { is_expected.to validate_presence_of(:card_cvc) }
+    it { is_expected.to validate_numericality_of(:card_exp_year).is_greater_than_or_equal_to(CURRENT_YEAR) }
   end
 
   describe '#perform!' do
