@@ -16,6 +16,7 @@ class PaymentsController < ApplicationController
     respond_with_action CreatePayment.new(action_params)
   end
 
+  # In production I should verify the event using the webhook secret.
   def webhook
     return unless params.fetch(:type) === 'payment_intent.succeeded'
 
